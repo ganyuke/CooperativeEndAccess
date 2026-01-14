@@ -1,0 +1,7 @@
+name: CooperativeEndAccess
+version: '0.0.1-1.21.11'
+main: io.github.ganyuke.cooperativeEndAccess.CooperativeEndAccess
+api-version: '1.21'
+authors: [ ganyuke ]
+description: Ensure that opening the End for the first time is always a group activity.
+website: https://github.com/ganyuke/CooperativeEndAccess

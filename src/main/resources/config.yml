@@ -1,0 +1,12 @@
+# Max eyes one player can contribute to a single portal structure
+max_eyes_per_player: 1
+# Distance (in blocks) that committed players must be for the portal to stay open
+activation_radius: 8.0
+# Sound played when a player enters/leaves the contribution zone
+presence_sound: "BLOCK_BEACON_ACTIVATE"
+
+messages:
+  max_eyes_error: "<red>You have already contributed your share to this portal!"
+  committed_notice: "<green>You are now committed to this portal."
+  rescind_warning: "<yellow>You took your eye back. The portal state may collapse."
+  dragon_defeat_notice: "<gold>The Dragon has fallen. End Portals are now stabilized permanently!"
