@@ -1,4 +1,9 @@
-package io.github.ganyuke.cooperativeEndAccess;
+package io.github.ganyuke.cooperativeEndAccess.portal;
+
+import io.github.ganyuke.cooperativeEndAccess.util.Util;
+import io.github.ganyuke.cooperativeEndAccess.config.Config;
+import io.github.ganyuke.cooperativeEndAccess.data.Persist;
+import io.github.ganyuke.cooperativeEndAccess.data.State;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -11,7 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import io.github.ganyuke.cooperativeEndAccess.Config.MessageKey;
+import io.github.ganyuke.cooperativeEndAccess.config.Config.MessageKey;
 
 import java.util.UUID;
 

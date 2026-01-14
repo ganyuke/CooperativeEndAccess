@@ -1,4 +1,6 @@
-package io.github.ganyuke.cooperativeEndAccess;
+package io.github.ganyuke.cooperativeEndAccess.data;
+
+import io.github.ganyuke.cooperativeEndAccess.util.Util;
 
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;

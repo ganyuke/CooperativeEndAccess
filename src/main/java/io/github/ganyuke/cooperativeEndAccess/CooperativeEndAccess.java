@@ -1,5 +1,11 @@
 package io.github.ganyuke.cooperativeEndAccess;
 
+import io.github.ganyuke.cooperativeEndAccess.config.Config;
+import io.github.ganyuke.cooperativeEndAccess.data.Persist;
+import io.github.ganyuke.cooperativeEndAccess.data.State;
+import io.github.ganyuke.cooperativeEndAccess.portal.PortalListener;
+import io.github.ganyuke.cooperativeEndAccess.portal.PortalManager;
+
 import org.bukkit.*;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;

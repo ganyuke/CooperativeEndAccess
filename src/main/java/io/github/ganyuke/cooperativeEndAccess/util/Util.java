@@ -1,4 +1,4 @@
-package io.github.ganyuke.cooperativeEndAccess;
+package io.github.ganyuke.cooperativeEndAccess.util;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;

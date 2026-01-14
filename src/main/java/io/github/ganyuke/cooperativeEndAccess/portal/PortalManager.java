@@ -1,4 +1,8 @@
-package io.github.ganyuke.cooperativeEndAccess;
+package io.github.ganyuke.cooperativeEndAccess.portal;
+
+import io.github.ganyuke.cooperativeEndAccess.util.Util;
+import io.github.ganyuke.cooperativeEndAccess.config.Config;
+import io.github.ganyuke.cooperativeEndAccess.data.State;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;

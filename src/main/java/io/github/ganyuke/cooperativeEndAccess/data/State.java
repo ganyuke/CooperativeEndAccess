@@ -1,6 +1,9 @@
-package io.github.ganyuke.cooperativeEndAccess;
+package io.github.ganyuke.cooperativeEndAccess.data;
+
+import io.github.ganyuke.cooperativeEndAccess.util.Util;
 
 import org.bukkit.Location;
+
 import java.util.*;
 
 public class State {

@@ -1,4 +1,4 @@
-package io.github.ganyuke.cooperativeEndAccess;
+package io.github.ganyuke.cooperativeEndAccess.config;
 
 import net.kyori.adventure.key.InvalidKeyException;
 import net.kyori.adventure.key.Key;
@@ -29,7 +29,7 @@ public class Config {
     private final FileConfiguration config;
     private final MiniMessage miniMessage;
 
-    Config(FileConfiguration config) {
+    public Config(FileConfiguration config) {
         this.config = config;
         this.activationRadius = config.getDouble("activation_radius", 8.0);
         this.maxEyesPerPlayer = config.getInt("max_eyes_per_player", 1);
