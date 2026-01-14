@@ -124,8 +124,8 @@ public class CooperativeEndAccess extends JavaPlugin implements Listener {
         }
     }
 
-
     private World getEndWorld() {
+        // cache the end world
         if (endWorld == null) {
             for (World world : Bukkit.getWorlds()) {
                 if (world.getEnvironment() == World.Environment.THE_END) {
@@ -145,47 +145,50 @@ public class CooperativeEndAccess extends JavaPlugin implements Listener {
 
         for (Map.Entry<Location, Map<UUID, Integer>> entry : state.getAllPortalContributors().entrySet()) {
             Location center = entry.getKey();
+
+            // skip player checks if portal isn't even filled
+            if (!isEndPortalFilled(center)) {
+                fillPortal(center, Material.AIR);
+                continue;
+            }
+
+            // we're going to be checking players by UUID, so we
+            // can strip down to just their UUIDs instead of commit counts
             Set<UUID> committed = entry.getValue().keySet();
 
-            boolean stabilized = isStabilized(committed, end);
-
-            boolean shouldFill = isEndPortalFilled(center) && (stabilized || areAllPlayersNearby(center, committed, radiusSq));
-
-            fillPortal(center, shouldFill ? Material.END_PORTAL : Material.AIR);
+            // if the conditions for a portal to exist are met, we can create
+            // the portal, else we will destroy the portal
+            if (checkConditions(center, committed, end, radiusSq)) {
+                fillPortal(center, Material.END_PORTAL);
+            } else {
+                fillPortal(center, Material.AIR);
+            }
         }
     }
 
-    /*
-        This particular method is for dragon fights. The portal will remain
-        "stabilized" (open) while players committed to that portal are
-        still alive in the End while the dragon has not been defeated.
-     */
-    private boolean isStabilized(Set<UUID> committed, World end) {
-        if (end == null) return false;
+    private boolean checkConditions(Location center, Set<UUID> committed, World end, double radiusSq) {
+        World centerWorld = center.getWorld();
+        boolean allNearby = true;
+
         for (UUID uuid : committed) {
             Player p = Bukkit.getPlayer(uuid);
-            // fast fail on first presence of player in the End
-            if (p != null && p.getWorld().equals(end) && !p.isDead()) {
+
+            // first condition: ANY player who committed to the portal is present in the End
+            // will immediately stabilize the portal (e.g. they are currently fighting the dragon)
+            if (p != null && end != null && p.getWorld().equals(end) && !p.isDead()) {
                 return true;
             }
-        }
-        return false;
-    }
 
-    private boolean areAllPlayersNearby(Location center, Set<UUID> committed, double radiusSq) {
-        World world = center.getWorld();
-        for (UUID uuid : committed) {
-            Player p = Bukkit.getPlayer(uuid);
-            if (p == null || !p.getWorld().equals(world)) return false;
-
-            // could do sqrt here, but I don't care about decimals.
-            // just need to know if distance exceeds radius. avoiding
-            // sqrt here should in theory be faster.
-            if (p.getLocation().distanceSquared(center) > radiusSq) {
-                return false;
+            // second condition: ALL players who committed to the portal is near the portal frame structure
+            // will temporarily stabilize the portal (e.g. they are present in the stronghold portal room)
+            if (allNearby) {
+                if (p == null || !p.getWorld().equals(centerWorld) || p.getLocation().distanceSquared(center) > radiusSq) {
+                    allNearby = false; // need to loop through all players since one committed player may be present in the End
+                }
             }
         }
-        return true;
+
+        return allNearby;
     }
 
     private static final int[][] FRAME_OFFSETS = {
