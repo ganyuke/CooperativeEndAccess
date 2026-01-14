@@ -2,58 +2,55 @@ package io.github.ganyuke.cooperativeEndAccess;
 
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 public class Persist {
-    File dataFile;
-    YamlConfiguration dataConfig;
+    private final File dataFile;
 
-    Persist(File dataFile) {
+    public Persist(File dataFile) {
         this.dataFile = dataFile;
     }
 
     public State loadData() {
-        var dataConfig = YamlConfiguration.loadConfiguration(dataFile);
-        var dragonDefeated = dataConfig.getBoolean("dragon_defeated", false);
-        var portalsConfig = dataConfig.getConfigurationSection("portals");
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(dataFile);
+        boolean dragonDefeated = config.getBoolean("dragon_defeated", false);
         Map<Location, Map<UUID, Integer>> portalContributors = new HashMap<>();
 
-        if (portalsConfig != null) {
-            for (String key : portalsConfig.getKeys(false)) {
+        var portalsSection = config.getConfigurationSection("portals");
+        if (portalsSection != null) {
+            for (String key : portalsSection.getKeys(false)) {
                 Location loc = Util.stringToLoc(key);
-                List<String> uuids = dataConfig.getStringList("portals." + key);
+                List<String> uuidStrings = config.getStringList("portals." + key);
                 Map<UUID, Integer> map = new HashMap<>();
-                for (String s : uuids) {
-                    UUID id = UUID.fromString(s);
-                    map.merge(id, 1, Integer::sum);
+                for (String s : uuidStrings) {
+                    map.merge(UUID.fromString(s), 1, Integer::sum);
                 }
                 portalContributors.put(loc, map);
             }
         }
-        this.dataConfig = dataConfig;
-
         return new State(portalContributors, dragonDefeated);
     }
 
     public void saveData(State state) {
-        dataConfig.set("dragon_defeated", state.getDragonDefeatStatus());
-        dataConfig.set("portals", null); // clear old portals section before rewriting
-        for (Map.Entry<Location, Map<UUID, Integer>> entry : state.getAllPortalContributors().entrySet()) {
-            List<String> strings = new ArrayList<>();
+        YamlConfiguration config = new YamlConfiguration();
+        config.set("dragon_defeated", state.getDragonDefeatStatus());
+        config.set("portals", null);
 
-            for (var contributor : entry.getValue().entrySet()) {
-                for (int i = 0; i < contributor.getValue(); i++) {
-                    strings.add(contributor.getKey().toString());
-                }
-            }
-
-            dataConfig.set("portals." + Util.locToString(entry.getKey()), strings);
+        for (var entry : state.getAllPortalContributors().entrySet()) {
+            List<String> uuidStrings = new ArrayList<>();
+            // Flatten the map (id + count) back into a list of strings
+            entry.getValue().forEach((uuid, count) -> {
+                for (int i = 0; i < count; i++) uuidStrings.add(uuid.toString());
+            });
+            config.set("portals." + Util.locToString(entry.getKey()), uuidStrings);
         }
-        try { dataConfig.save(dataFile); } catch (IOException e) {
-            throw new RuntimeException("Failed to write data to " + dataFile.getName(), e);
+
+        try {
+            config.save(dataFile);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save `config.yml`", e);
         }
     }
 }
