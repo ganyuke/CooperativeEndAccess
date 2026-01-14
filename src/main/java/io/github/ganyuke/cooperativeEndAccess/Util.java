@@ -12,7 +12,7 @@ public final class Util {
         return new Location(Bukkit.getWorld(p[0]), Integer.parseInt(p[1]), Integer.parseInt(p[2]), Integer.parseInt(p[3]));
     }
 
-    private static final int[][] FRAME_OFFSETS = {
+    public static final int[][] FRAME_OFFSETS = {
             {2, -1}, {2, 0}, {2, 1},   // East side
             {-2, -1}, {-2, 0}, {-2, 1}, // West side
             {-1, 2}, {0, 2}, {1, 2},    // South side

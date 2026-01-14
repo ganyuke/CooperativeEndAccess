@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.ItemStack;
 import io.github.ganyuke.cooperativeEndAccess.Config.MessageKey;
 
@@ -49,7 +48,7 @@ public class PortalListener implements Listener {
         if (isEye(event.getItem())) {
             // PLACING AN EYE
             if (!frame.hasEye()) {
-                if (state.getContributions(center, uuid) >= config.getMaxEyesPerPlayer()) {
+                if (state.getFramesOwnedBy(center, uuid).size() >= config.getMaxEyesPerPlayer()) {
                     player.sendMessage(config.getMessage(MessageKey.MAX_EYES_ERROR));
                     event.setCancelled(true);
                     return;
@@ -73,13 +72,24 @@ public class PortalListener implements Listener {
                     event.getPlayer().playSound(block.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1f, 1f);
                 }
 
-                state.addContributor(center, uuid);
+                state.addEye(center, block.getLocation(), uuid);
                 persist.saveData(state);
                 player.sendMessage(config.getMessage(MessageKey.COMMITTED_NOTICE));
             }
         } else if (event.getItem() == null && frame.hasEye()) {
             // REMOVING AN EYE
-            if (state.removeContributor(center, uuid)) {
+            Location frameLoc = block.getLocation();
+            UUID owner = state.getEyeOwner(frameLoc);
+            if (owner == null) return;
+
+            if (!owner.equals(player.getUniqueId())) {
+                event.setCancelled(true);
+                String ownerName = Bukkit.getOfflinePlayer(owner).getName();
+                player.sendMessage(config.getOwnerRescindWarning(ownerName));
+                return;
+            }
+
+            if (state.removeEye(frameLoc)) {
                 frame.setEye(false);
                 block.setBlockData(frame);
                 player.getInventory().addItem(new ItemStack(Material.ENDER_EYE));

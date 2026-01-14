@@ -1,6 +1,7 @@
 package io.github.ganyuke.cooperativeEndAccess;
 
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
@@ -16,21 +17,21 @@ public class Persist {
     public State loadData() {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(dataFile);
         boolean dragonDefeated = config.getBoolean("dragon_defeated", false);
-        Map<Location, Map<UUID, Integer>> portalContributors = new HashMap<>();
 
-        var portalsSection = config.getConfigurationSection("portals");
-        if (portalsSection != null) {
-            for (String key : portalsSection.getKeys(false)) {
-                Location loc = Util.stringToLoc(key);
-                List<String> uuidStrings = config.getStringList("portals." + key);
-                Map<UUID, Integer> map = new HashMap<>();
-                for (String s : uuidStrings) {
-                    map.merge(UUID.fromString(s), 1, Integer::sum);
-                }
-                portalContributors.put(loc, map);
+        Map<Location, UUID> eyeOwners = new HashMap<>();
+        Set<Location> centers = new HashSet<>();
+
+        ConfigurationSection eyesSection = config.getConfigurationSection("eyes");
+        if (eyesSection != null) {
+            for (String key : eyesSection.getKeys(false)) {
+                eyeOwners.put(Util.stringToLoc(key), UUID.fromString(Objects.requireNonNull(eyesSection.getString(key))));
             }
         }
-        return new State(portalContributors, dragonDefeated);
+
+        List<String> centerStrings = config.getStringList("centers");
+        for (String s : centerStrings) centers.add(Util.stringToLoc(s));
+
+        return new State(eyeOwners, centers, dragonDefeated);
     }
 
     public void saveData(State state) {
@@ -38,14 +39,13 @@ public class Persist {
         config.set("dragon_defeated", state.getDragonDefeatStatus());
         config.set("portals", null);
 
-        for (var entry : state.getAllPortalContributors().entrySet()) {
-            List<String> uuidStrings = new ArrayList<>();
-            // Flatten the map (id + count) back into a list of strings
-            entry.getValue().forEach((uuid, count) -> {
-                for (int i = 0; i < count; i++) uuidStrings.add(uuid.toString());
-            });
-            config.set("portals." + Util.locToString(entry.getKey()), uuidStrings);
+        for (Map.Entry<Location, UUID> entry : state.getEyeOwners().entrySet()) {
+            config.set("eyes." + Util.locToString(entry.getKey()), entry.getValue().toString());
         }
+
+        List<String> centerStrings = state.getPortalCenters().stream()
+                .map(Util::locToString).toList();
+        config.set("centers", centerStrings);
 
         try {
             config.save(dataFile);

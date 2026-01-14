@@ -35,6 +35,7 @@ messages:
   max_eyes_error: "<red>You have already contributed your share to this portal!"
   committed_notice: "<green>You are now committed to this portal."
   rescind_warning: "<yellow>You took your eye back. The portal state may collapse."
+  non_owner_rescind_warning: "<red>This eye was placed by {name}. You cannot remove it."
   dragon_defeat_notice: "<gold>The Dragon has fallen. End Portals are now stabilized permanently!"
   stabilized_action_bar: "<bold><light_purple>✔ Stabilized by {name}"
   active_action_bar: "<bold><green>✔ Portal Active"

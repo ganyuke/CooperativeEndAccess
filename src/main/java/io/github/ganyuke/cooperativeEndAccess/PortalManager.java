@@ -26,9 +26,8 @@ public class PortalManager {
         double actionBarRadiusSq = Math.pow(config.getActionBarRadius(), 2);
         World end = getEndWorld();
 
-        for (var entry : state.getAllPortalContributors().entrySet()) {
-            Location center = entry.getKey();
-            Set<UUID> committed = entry.getValue().keySet();
+        for (Location center : state.getPortalCenters()) {
+            Set<UUID> committed = state.getCommittedPlayers(center);
 
             if (!Util.isEndPortalFilled(center)) {
                 // ensure that the portal closes
@@ -99,7 +98,15 @@ public class PortalManager {
         PortalResult res = new PortalResult();
         World world = center.getWorld();
 
-        for (UUID id : committed) {
+        Set<UUID> portalContributors = new HashSet<>();
+
+        for (int[] off : Util.FRAME_OFFSETS) {
+            Location frameLoc = center.clone().add(off[0], off[1], off[2]);
+            UUID owner = state.getEyeOwner(frameLoc);
+            if (owner != null) portalContributors.add(owner);
+        }
+
+        for (UUID id : portalContributors) {
             Player p = Bukkit.getPlayer(id);
             if (p == null) {
                 res.missingNames.add("Offline Player");

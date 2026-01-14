@@ -20,8 +20,10 @@ public class Config {
 
     private final double activationRadius;
     private final double actionBarRadius;
+
     private final String stabilizedActionBarTemplate;
     private final String waitingActionBarTemplate;
+    private final String nonOwnerRescindWarningTemplate;
 
     private final int maxEyesPerPlayer;
     private final FileConfiguration config;
@@ -34,6 +36,7 @@ public class Config {
         this.actionBarRadius = config.getDouble("action_bar_radius", 60.0);
         this.stabilizedActionBarTemplate = config.getString("messages.stabilized_action_bar");
         this.waitingActionBarTemplate = config.getString("messages.waiting_action_bar");
+        this.nonOwnerRescindWarningTemplate = config.getString("messages.non_owner_rescind_warning");
         this.miniMessage = MiniMessage.miniMessage();
     }
 
@@ -95,6 +98,10 @@ public class Config {
 
     public Component getWaitingActionBar(String names) {
         return miniMessage.deserialize(this.waitingActionBarTemplate, Placeholder.unparsed("names", names));
+    }
+
+    public Component getOwnerRescindWarning(String name) {
+        return miniMessage.deserialize(this.nonOwnerRescindWarningTemplate, Placeholder.unparsed("name", name));
     }
 
     public Component getMessage(MessageKey key) {

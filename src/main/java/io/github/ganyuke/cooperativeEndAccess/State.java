@@ -4,43 +4,65 @@ import org.bukkit.Location;
 import java.util.*;
 
 public class State {
-    private final Map<Location, Map<UUID, Integer>> portalContributors;
+    private final Map<Location, UUID> eyeOwners;
+    private final Set<Location> portalCenters;
     private boolean dragonDefeated;
 
-    public State(Map<Location, Map<UUID, Integer>> portalContributors, boolean dragonDefeated) {
-        this.portalContributors = portalContributors;
+    public State(Map<Location, UUID> eyeOwners, Set<Location> portalCenters, boolean dragonDefeated) {
+        this.eyeOwners = eyeOwners;
+        this.portalCenters = portalCenters;
         this.dragonDefeated = dragonDefeated;
     }
 
-    public Map<Location, Map<UUID, Integer>> getAllPortalContributors() {
-        return portalContributors; // let's just hope I don't write code that modifies this
+    public void addEye(Location center, Location frameLoc, UUID id) {
+        eyeOwners.put(frameLoc, id);
+        portalCenters.add(center);
     }
 
-    public int getContributions(Location center, UUID id) {
-        return portalContributors
-                .getOrDefault(center, Map.of())
-                .getOrDefault(id, 0);
+    public UUID getEyeOwner(Location frameLoc) {
+        return eyeOwners.get(frameLoc);
     }
 
-    public void addContributor(Location center, UUID id) {
-        portalContributors.computeIfAbsent(center, k -> new HashMap<>())
-                .merge(id, 1, Integer::sum);
+    public boolean removeEye(Location frameLoc) {
+        return eyeOwners.remove(frameLoc) != null;
     }
 
-    public boolean removeContributor(Location center, UUID id) {
-        Map<UUID, Integer> contributors = portalContributors.get(center);
-        if (contributors == null) return false;
-        Integer count = contributors.get(id);
-        if (count == null) return false;
+    public List<Location> getFramesOwnedBy(Location center, UUID playerId) {
+        List<Location> ownedFrames = new ArrayList<>();
 
-        if (count <= 1) {
-            contributors.remove(id);
-            if (contributors.isEmpty()) portalContributors.remove(center);
-        } else {
-            contributors.put(id, count - 1);
+        int[][] offsets = Util.FRAME_OFFSETS;
+
+        for (int[] off : offsets) {
+            Location frameLoc = center.clone().add(off[0], off[1], off[2]);
+
+            UUID ownerId = this.getEyeOwner(frameLoc);
+            if (playerId.equals(ownerId)) {
+                ownedFrames.add(frameLoc);
+            }
         }
-        return true;
+
+        return ownedFrames;
     }
+
+    public Set<UUID> getCommittedPlayers(Location center) {
+        Set<UUID> committed = new HashSet<>();
+
+        int[][] offsets = Util.FRAME_OFFSETS;
+
+        for (int[] off : offsets) {
+            Location frameLoc = center.clone().add(off[0], off[1], off[2]);
+            UUID owner = this.getEyeOwner(frameLoc);
+
+            if (owner != null) {
+                committed.add(owner);
+            }
+        }
+
+        return committed;
+    }
+
+    public Map<Location, UUID> getEyeOwners() { return eyeOwners; }
+    public Set<Location> getPortalCenters() { return portalCenters; }
 
     public void setDragonDefeatedStatus(boolean status) { this.dragonDefeated = status; }
     public boolean getDragonDefeatStatus() { return dragonDefeated; }
