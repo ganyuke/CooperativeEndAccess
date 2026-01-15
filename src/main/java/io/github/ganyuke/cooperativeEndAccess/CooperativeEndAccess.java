@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: ganyuke
 package io.github.ganyuke.cooperativeEndAccess;
 
 import io.github.ganyuke.cooperativeEndAccess.config.Config;
@@ -38,6 +40,13 @@ public class CooperativeEndAccess extends JavaPlugin implements Listener {
 
         persist = new Persist(dataFile);
         state = persist.loadData();
+
+        if (state.getDragonDefeatStatus()) {
+            this.getLogger().info("Plugin shutting down; `data.yml` indicates the Ender Dragon has already been defeated.");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         config = new Config(this.getConfig());
         config.loadMessages();
         config.loadSounds();

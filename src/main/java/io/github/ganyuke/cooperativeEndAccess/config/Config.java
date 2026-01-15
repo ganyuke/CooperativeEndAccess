@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: ganyuke
 package io.github.ganyuke.cooperativeEndAccess.config;
 
 import io.github.ganyuke.cooperativeEndAccess.util.BlockKey;
