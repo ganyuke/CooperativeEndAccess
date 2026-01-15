@@ -4,6 +4,7 @@ import io.github.ganyuke.cooperativeEndAccess.portal.PortalUtils;
 import io.github.ganyuke.cooperativeEndAccess.util.BlockKey;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class State {
     private final Map<BlockKey, UUID> eyeOwners;
@@ -55,45 +56,23 @@ public class State {
     }
 
     public int countFramesOwnedBy(BlockKey center, UUID id) {
-        int cx = center.x();
-        int cy = center.y(); // End Portals are always horizontal, so no Y-offset needed
-        int cz = center.z();
-
-        int count = 0;
-
-        for (int[] offset : PortalUtils.FRAME_OFFSETS) {
-            int x = cx + offset[0];
-            int z = cz + offset[1];
-
-            var frameLoc = new BlockKey(center.worldName(), x, cy, z);
-            var ownerId = this.getEyeOwner(frameLoc);
-            if (id.equals(ownerId)) {
-                count += 1;
+        AtomicInteger count = new AtomicInteger(0); // need array to allow mutation
+        return PortalUtils.processFrameLocations(center, count, (frameLoc, acc) -> {
+            if (id.equals(this.getEyeOwner(frameLoc))) {
+                acc.incrementAndGet();
             }
-        }
-        return count;
+            return true;
+        }).get();
     }
 
     public Set<UUID> getCommittedPlayers(BlockKey center) {
-        int cx = center.x();
-        int cy = center.y(); // End Portals are always horizontal, so no Y-offset needed
-        int cz = center.z();
-
-        Set<UUID> committed = new HashSet<>();
-
-        for (int[] offset : PortalUtils.FRAME_OFFSETS) {
-            int x = cx + offset[0];
-            int z = cz + offset[1];
-
-
-            BlockKey frameLoc = new BlockKey(center.worldName(), x, cy, z);
+        return PortalUtils.processFrameLocations(center, new HashSet<>(), (frameLoc, committed) -> {
             UUID owner = this.getEyeOwner(frameLoc);
-
             if (owner != null) {
                 committed.add(owner);
             }
-        }
-        return committed;
+            return true;
+        });
     }
 
     public Map<BlockKey, UUID> getEyeOwners() { return eyeOwners; }
