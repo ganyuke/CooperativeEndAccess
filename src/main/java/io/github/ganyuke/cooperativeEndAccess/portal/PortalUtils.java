@@ -1,15 +1,20 @@
-package io.github.ganyuke.cooperativeEndAccess.util;
+package io.github.ganyuke.cooperativeEndAccess.portal;
 
-import org.bukkit.*;
+import io.github.ganyuke.cooperativeEndAccess.util.BlockKey;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.EndPortalFrame;
 
-public final class Util {
-    public static String locToString(Location l) { return l.getWorld().getName() + "," + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ(); }
-    public static Location stringToLoc(String s) {
-        String[] p = s.split(",");
-        return new Location(Bukkit.getWorld(p[0]), Integer.parseInt(p[1]), Integer.parseInt(p[2]), Integer.parseInt(p[3]));
+import java.util.*;
+
+public final class PortalUtils {
+    protected static class PortalResult {
+        boolean isActive;
+        String stabilizerName;
+        final Set<UUID> nearbyPlayers = new HashSet<>();
+        final List<String> missingNames = new ArrayList<>();
     }
 
     public static final int[][] FRAME_OFFSETS = {
@@ -19,15 +24,17 @@ public final class Util {
             {-1, -2}, {0, -2}, {1, -2}  // North side
     };
 
-    private static boolean isEndPortalValid(Location center, boolean shouldBeFilled) {
+    private static boolean isEndPortalValid(BlockKey center, boolean shouldBeFilled) {
         // calculate if End Portal frames surround the center and (optionally) are
         // all filled with eyes.
         // assumes that the End Portal is a standard 5x5 End Portal without corners.
         // assumes that all frames are facing the correct direction.
         World world = center.getWorld();
-        int cx = center.getBlockX();
-        int cy = center.getBlockY(); // End Portals are always horizontal, so no Y-offset needed
-        int cz = center.getBlockZ();
+        if (world == null) return false;
+
+        int cx = center.x();
+        int cy = center.y(); // End Portals are always horizontal, so no Y-offset needed
+        int cz = center.z();
 
         for (int[] offset : FRAME_OFFSETS) {
             int x = cx + offset[0];
@@ -48,19 +55,21 @@ public final class Util {
         return true;
     }
 
-    public static boolean isEndPortalFilled(Location center) {
+    public static boolean isEndPortalFilled(BlockKey center) {
         return isEndPortalValid(center, true);
     }
 
-    public static boolean isEndPortalCenter(Location center) {
+    public static boolean isEndPortalCenter(BlockKey center) {
         return isEndPortalValid(center, false);
     }
 
-    public static int countEndFrameEyes(Location center) {
+    public static int countEndFrameEyes(BlockKey center) {
         World world = center.getWorld();
-        int cx = center.getBlockX();
-        int cy = center.getBlockY(); // End Portals are always horizontal, so no Y-offset needed
-        int cz = center.getBlockZ();
+        if (world == null) return -1;
+
+        int cx = center.x();
+        int cy = center.y(); // End Portals are always horizontal, so no Y-offset needed
+        int cz = center.z();
 
         int count = 0;
 
@@ -81,44 +90,19 @@ public final class Util {
         return count;
     }
 
-    public static void fillPortal(Location center, Material material) {
-        World world = center.getWorld();
-        boolean changed = false;
-
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                Block b = center.clone().add(x, 0, z).getBlock();
-                if (b.getType() != material) {
-                    b.setType(material, false);
-                    changed = true;
-                }
-            }
-        }
-
-        if (changed && material == Material.END_PORTAL) {
-            world.spawnParticle(
-                    Particle.DRAGON_BREATH,
-                    center,
-                    50,
-                    1, 0, 1,
-                    0.1,
-                    1.0f
-            );
-
-        }
-    }
-
-    public static Location findPortalCenter(Location frameLoc) {
+    public static BlockKey findPortalCenter(BlockKey frameLoc) {
         World world = frameLoc.getWorld();
-        Block b = world.getBlockAt(frameLoc);
+        if (world == null) return null;
+
+        int fx = frameLoc.x();
+        int fy = frameLoc.y();
+        int fz = frameLoc.z();
+
+        Block b = world.getBlockAt(fx, fy, fz);
         if (b.getType() != Material.END_PORTAL_FRAME) return null;
 
         EndPortalFrame data = (EndPortalFrame) b.getBlockData();
         BlockFace facing = data.getFacing();
-
-        int fx = b.getX();
-        int fy = b.getY();
-        int fz = b.getZ();
 
         int inwardX = facing.getModX();
         int inwardZ = facing.getModZ();
@@ -129,15 +113,17 @@ public final class Util {
         int centerXAxis = fx + (inwardX * 2);
         int centerZAxis = fz + (inwardZ * 2);
 
+        String worldName = frameLoc.worldName();
+
         // the center is now three possible locations: to the left, to the right, or in the middle
-        Location[] candidates = {
-                new Location(world, centerXAxis, fy, centerZAxis),
+        BlockKey[] candidates = {
+                new BlockKey(worldName, centerXAxis, fy, centerZAxis),
                 // swap inwardX/Z to get sideways direction
-                new Location(world, centerXAxis + inwardZ, fy, centerZAxis + inwardX),
-                new Location(world, centerXAxis - inwardZ, fy, centerZAxis - inwardX)
+                new BlockKey(worldName, centerXAxis + inwardZ, fy, centerZAxis + inwardX),
+                new BlockKey(worldName, centerXAxis - inwardZ, fy, centerZAxis - inwardX)
         };
 
-        for (Location loc : candidates) {
+        for (BlockKey loc : candidates) {
             if (isEndPortalCenter(loc)) return loc;
         }
 

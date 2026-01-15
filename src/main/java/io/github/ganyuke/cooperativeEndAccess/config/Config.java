@@ -1,12 +1,13 @@
 package io.github.ganyuke.cooperativeEndAccess.config;
 
+import io.github.ganyuke.cooperativeEndAccess.util.BlockKey;
 import net.kyori.adventure.key.InvalidKeyException;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -31,13 +32,19 @@ public class Config {
 
     public Config(FileConfiguration config) {
         this.config = config;
-        this.activationRadius = config.getDouble("activation_radius", 8.0);
-        this.maxEyesPerPlayer = config.getInt("max_eyes_per_player", 1);
-        this.actionBarRadius = config.getDouble("action_bar_radius", 60.0);
         this.stabilizedActionBarTemplate = config.getString("messages.stabilized_action_bar");
         this.waitingActionBarTemplate = config.getString("messages.waiting_action_bar");
         this.nonOwnerRescindWarningTemplate = config.getString("messages.non_owner_rescind_warning");
         this.miniMessage = MiniMessage.miniMessage();
+
+        int maxEyesPerPlayer = config.getInt("max_eyes_per_player", 1);
+        this.maxEyesPerPlayer = Math.clamp(maxEyesPerPlayer, 0, 12);
+
+        double activationRadius = config.getDouble("activation_radius", 8.0);
+        this.activationRadius = Math.max(activationRadius, -1);
+
+        var actionBarRadius = config.getDouble("action_bar_radius", 60.0);
+        this.actionBarRadius = Math.max(actionBarRadius, -1);
     }
 
     public double getActivationRadius() {
@@ -159,16 +166,20 @@ public class Config {
             }
 
             float volume = (float) specificSoundSection.getDouble("volume", 1.0);
+            volume = Math.max(volume, 0.0f);
             float pitch = (float) specificSoundSection.getDouble("pitch", 1.0);
+            pitch = Math.clamp(pitch, 0.5f, 2.0f);
 
             Sound sound = Sound.sound(key, source, volume, pitch);
             sounds.put(soundKey, sound);
         }
     }
 
-    public void play(SoundKey soundKey, Location loc) {
+    public void play(SoundKey soundKey, BlockKey loc) {
         Sound sound = Objects.requireNonNull(sounds.get(soundKey)); // should be not null
-        loc.getWorld().playSound(sound, loc.getX(), loc.getY(), loc.getZ());
+        World world = loc.getWorld();
+        if (world == null) return;
+        world.playSound(sound, loc.x(), loc.y(), loc.z());
     }
 
     public void play(SoundKey soundKey, Player player) {

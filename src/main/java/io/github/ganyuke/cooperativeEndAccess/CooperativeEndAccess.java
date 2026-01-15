@@ -46,7 +46,7 @@ public class CooperativeEndAccess extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(new PortalListener(state, persist, config, portalManager), this);
 
-        portalTask = getServer().getScheduler().runTaskTimer(this, portalManager::update, 20L, 10L);
+        portalTask = getServer().getScheduler().runTaskTimer(this, portalManager::updateTrackedPortals, 20L, 10L);
     }
 
     @Override

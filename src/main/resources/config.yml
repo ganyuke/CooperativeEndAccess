@@ -1,10 +1,22 @@
-# Max eyes one player can contribute to a single portal structure
-max_eyes_per_player: 1
-# Distance (in blocks) that committed players must be for the portal to stay open
-activation_radius: 8.0
-# Distance (in blocks) that committed players must be to receive portal status messages
+# Maximum eyes one player can contribute to a single portal structure
+# Automatically clamps to range between 0 and 12 (though why would you pick 0??)
+max_eyes_per_player: 3
+
+# Distance semantics:
+# - Distances below 0 (e.g. -1) are treated as unlimited range, ignoring dimension.
+#   In other words, presence in server is enough to trigger the effects.
+# - All distances are 3D Euclidean distance from the portal center.
+
+# Maximum distance (in blocks) committed players may be from the portal for it to remain open
+activation_radius: 16.0
+# Maximum distance (in blocks) a committed player may be from the portal to receive action bar updates
 action_bar_radius: 60.0
 
+# For sound keys, see [Paper's documentation](https://docs.papermc.io/paper/dev/command-api/arguments/registry/#sound)
+# or [visit the Minecraft Wiki](https://minecraft.wiki/w/Sounds.json#Sound_events).
+# For types of sources, use the "Technical name" on the [Minecraft Wiki's Sound page](https://minecraft.wiki/w/Sound#Categories).
+# Volume is clamped to 0.0f at minimum and pitch is clamped to [0.5f, 2.0f] (which are limitations imposed by vanilla Java Edition).
+# See the [Minecraft Wiki's /playsound page](https://minecraft.wiki/w/Commands/playsound#Arguments) for more details.
 sounds:
   # Sound played when the End Portal is created
   portal_open:
@@ -21,22 +33,34 @@ sounds:
   # Sound played when a player enters the activation_radius
   player_enter:
     key: "minecraft:block.amethyst_block.chime"
-    source: "PLAYER"
+    source: "player"
     volume: 1.0
     pitch: 1.0
   # Sound played when a player leaves the activation_radius
   player_leave:
     key: "minecraft:block.amethyst_block.break"
-    source: "PLAYER"
+    source: "player"
     volume: 1.0
     pitch: 0.5
 
+# Uses MiniMessage format. See [Paper's documentation](https://docs.papermc.io/adventure/minimessage/format/)
 messages:
+  # Personal chat message error when player tries to place more eyes than max_eyes_per_player
   max_eyes_error: "<red>You have already contributed your share to this portal!"
-  committed_notice: "<green>You are now committed to this portal."
+  # Personal chat message warning when player removes an eye
   rescind_warning: "<yellow>You took your eye back. The portal state may collapse."
-  non_owner_rescind_warning: "<red>This eye was placed by {name}. You cannot remove it."
+  # Personal chat message warning when player tries to remove another player's eye
+  # Placeholder: <name> - The player who owns the eye (e.g. "Megumin").
+  non_owner_rescind_warning: "<red>This eye was placed by <name>. You cannot remove it."
+  # Personal chat message notice when player places an eye
+  committed_notice: "<green>You are now committed to this portal."
+  # Server-broadcasted chat notice once the dragon has been defeated for the first time.
   dragon_defeat_notice: "<gold>The Dragon has fallen. End Portals are now stabilized permanently!"
-  stabilized_action_bar: "<bold><light_purple>✔ Stabilized by {name}"
+  # Action bar text shown while a committed player is in the End
+  # Placeholder: <name> - A committed player present in the End (e.g. "Sumi"), chosen implicitly by eye insertion order.
+  stabilized_action_bar: "<bold><light_purple>✔ Stabilized by <name>"
+  # Action bar shown when a portal is open
   active_action_bar: "<bold><green>✔ Portal Active"
-  waiting_action_bar: "<gold>Waiting for: <white>{names}"
+  # Action bar shown when a portal is awaiting all committed players to be present before opening
+  # Placeholder: <names> - comma-delimited list of committed player names missing (e.g. "Notch, Elaina, Mizuhara")
+  waiting_action_bar: "<gold>Waiting for: <white><names>"
