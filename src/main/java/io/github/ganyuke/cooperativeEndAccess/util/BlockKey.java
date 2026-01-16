@@ -5,8 +5,8 @@ package io.github.ganyuke.cooperativeEndAccess.util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.jspecify.annotations.NonNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public record BlockKey(String worldName, int x, int y, int z) {
@@ -29,7 +29,7 @@ public record BlockKey(String worldName, int x, int y, int z) {
         return new Location(world, x, y, z);
     }
 
-    public @NonNull String toString() {
+    public @Nonnull String toString() {
         return this.worldName + "," + this.x + "," + this.y + "," + this.z;
     }
 

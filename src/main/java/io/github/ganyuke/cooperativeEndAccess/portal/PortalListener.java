@@ -122,6 +122,9 @@ public class PortalListener implements Listener {
 
         var ctx = PortalUtils.PortalInteractionContext.from(event);
 
+        // if they're not looking at an end frame, then what they do doesn't matter
+        if (ctx.frame() == null) return;
+
         if (ctx.isOffHand() && debounce.contains(ctx.playerId())) {
             event.setCancelled(true);
             debounce.remove(ctx.playerId());
@@ -129,10 +132,14 @@ public class PortalListener implements Listener {
         }
 
         if (ctx.isMainHand()) {
+            // check if they (1) have an eye and (2) are looking at an empty end frame
             if (ctx.isHoldingEye() && !ctx.isFrameFilled()) {
                 // handle placement from the main hand
                 this.handleEyePlacement(ctx);
-            } else if (ctx.isHoldingNothing() && ctx.isFrameFilled()) {
+            }
+            // if their (1) hand is empty and (2) are looking at a filled frame,
+            // they probably want to take out the eye
+            else if (ctx.isHoldingNothing() && ctx.isFrameFilled()) {
                 // handle removal from the main hand
                 this.handleEyeRemoval(ctx);
                 // need to debounce this to avoid immediately filling the frame

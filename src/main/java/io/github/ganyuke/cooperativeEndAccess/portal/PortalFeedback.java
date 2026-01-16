@@ -18,9 +18,25 @@ import java.util.*;
 class PortalFeedback {
     private final Map<BlockKey, Set<UUID>> lastKnownNearby = new HashMap<>();
     private final Config config;
+    private final boolean below1_21_9;
+
+    public boolean isBelow1_21_9() {
+        return below1_21_9;
+    }
+
+    private boolean checkIsBelow1_21_9() {
+        String v = Bukkit.getMinecraftVersion();
+        String[] parts = v.split("\\.");
+        // I'm sure Minecraft 2.0 is not coming any time soon
+        int minor = Integer.parseInt(parts[1]);
+        int patch = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
+
+        return minor == 21 && patch < 9;
+    }
 
     PortalFeedback(Config config) {
         this.config = config;
+        below1_21_9 = checkIsBelow1_21_9();
     }
 
     protected void addAudience(BlockKey center, Set<UUID> nearbyCommittedPlayers) {
@@ -51,14 +67,27 @@ class PortalFeedback {
     }
 
     private void spawnParticles(World world, int x, int y, int z) {
-        world.spawnParticle(
-                Particle.DRAGON_BREATH,
-                new Location(world, x, y, z),
-                50,
-                1, 0, 1,
-                0.1,
-                1.0f
-        );
+        // beginning in 1.21.9, you need to supply a float to the `data` argument
+        // lest you incur the wrath of the NullPointerException
+        if (isBelow1_21_9()) {
+            world.spawnParticle(
+                    Particle.DRAGON_BREATH,
+                    new Location(world, x, y, z),
+                    50,
+                    1, 0, 1,
+                    0.1,
+                    null
+            );
+        } else {
+            world.spawnParticle(
+                    Particle.DRAGON_BREATH,
+                    new Location(world, x, y, z),
+                    50,
+                    1, 0, 1,
+                    0.1,
+                    1.0f
+            );
+        }
     }
 
     protected void openPortalFx(BlockKey center) {
