@@ -14,10 +14,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import io.github.ganyuke.cooperativeEndAccess.config.Config.MessageKey;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class PortalListener implements Listener {
@@ -25,6 +26,7 @@ public class PortalListener implements Listener {
     private final Persist persist;
     private final Config config;
     private final PortalManager portalManager;
+    private final Set<UUID> debounce = new HashSet<>();
 
     public PortalListener(State state, Persist persist, Config config, PortalManager portalManager) {
         this.state = state;
@@ -117,15 +119,32 @@ public class PortalListener implements Listener {
         if (state.getDragonDefeatStatus()) return;
         // the follow actions don't matter if it wasn't a right click
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        // avoid double-firing the removal logic from the OFF_HAND interaction event
-        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
 
         var ctx = PortalUtils.PortalInteractionContext.from(event);
 
-        if (ctx.isHoldingEye() && !ctx.isFrameFilled()) {
+        if (ctx.isOffHand() && debounce.contains(ctx.playerId())) {
+            event.setCancelled(true);
+            debounce.remove(ctx.playerId());
+            return;
+        }
+
+        if (ctx.isMainHand()) {
+            if (ctx.isHoldingEye() && !ctx.isFrameFilled()) {
+                // handle placement from the main hand
+                this.handleEyePlacement(ctx);
+            } else if (ctx.isHoldingNothing() && ctx.isFrameFilled()) {
+                // handle removal from the main hand
+                this.handleEyeRemoval(ctx);
+                // need to debounce this to avoid immediately filling the frame
+                // again when the main hand is empty but the off-hand has an eye
+                boolean hasEyeInOffHand = ctx.player().getInventory().getItemInOffHand().getType() == Material.ENDER_EYE;
+                if (hasEyeInOffHand) {
+                    debounce.add(ctx.playerId());
+                }
+            }
+        } else if (ctx.isOffHand() && ctx.isHoldingEye() && !ctx.isFrameFilled()) {
+            // handle placement from the off-hand
             this.handleEyePlacement(ctx);
-        } else if (ctx.isHoldingNothing() && ctx.isFrameFilled()) {
-            this.handleEyeRemoval(ctx);
         }
     }
 

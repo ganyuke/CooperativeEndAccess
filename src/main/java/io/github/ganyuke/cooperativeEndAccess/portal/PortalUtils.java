@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.EndPortalFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -37,7 +38,9 @@ public final class PortalUtils {
             EndPortalFrame frame,
             boolean isHoldingNothing,
             boolean isHoldingEye,
-            boolean isFrameFilled
+            boolean isFrameFilled,
+            boolean isMainHand,
+            boolean isOffHand
     ) {
         public static PortalInteractionContext from(PlayerInteractEvent event) {
             Block block = event.getClickedBlock();
@@ -59,10 +62,13 @@ public final class PortalUtils {
             UUID uuid = player.getUniqueId();
             boolean isHoldingNothing = event.getItem() == null;
             boolean isHoldingEye = !isHoldingNothing && PortalUtils.isEye(event.getItem());
+            boolean isMainHand = event.getHand() == EquipmentSlot.HAND;
+            boolean isOffHand = event.getHand() == EquipmentSlot.OFF_HAND;
 
             return new PortalInteractionContext(
                     event, block, center, player, uuid,
-                    frame, isHoldingNothing, isHoldingEye, isFrameFilled
+                    frame, isHoldingNothing, isHoldingEye,
+                    isFrameFilled, isMainHand, isOffHand
             );
         }
     }
