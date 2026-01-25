@@ -2,7 +2,7 @@
 
 A very, very opinionated plugin for people who don't trust their friends to not beat the Ender Dragon all on their own and instead forces them to all be present to open the End Portal.
 
-Targets Paper servers on Minecraft 1.21.11. Expected to be used for small (4 to 20), friend-group survival multiplayer (SMP) servers.
+Targets Paper servers on Minecraft 1.21 to 1.21.11. Expected to be used for small (4 to 20), friend-group survival multiplayer (SMP) servers.
 
 ## Features
 
@@ -28,7 +28,7 @@ These aren't frequent because I just recently made this plugin and no one has as
 
 ### Who is plugin for?
 
-Server administrators running a small, Paper-based Minecraft 1.21.11 survival multiplayer server (SMP) who are shy / lack enough social currency to convince / do not trust their friends not to beat the dragon solo.
+Server administrators running a small, Paper-based Minecraft 1.21 to 1.21.11 survival multiplayer server (SMP) who are shy / lack enough social currency to convince / do not trust their friends not to beat the dragon solo.
 
 If you:
 
@@ -40,7 +40,7 @@ If you:
 
 ### How do I use this plugin?
 
-1. Download the `.jar` for this plugin.
+1. Download the `.jar` for this plugin from either [GitHub](https://github.com/ganyuke/CooperativeEndAccess/releases) or [Modrinth](https://modrinth.com/plugin/cooperative-end-access/versions).
 2. Place it in your server's `plugins/` directory.
 3. Run the server.
 
@@ -166,7 +166,7 @@ Report issues with my spaghetti code through the [issue tracker](https://github.
 
 ### How do I submit features for this plugin?
 
-If you wrote the code for it, I'll happily accept a pull request for it if I feel like it doesn't bloat the scope of this plugin.
+If you wrote the code for it, I'll happily accept a pull request if I feel like it doesn't bloat the scope of this plugin. Ensure that you use the [pull request template](https://raw.githubusercontent.com/ganyuke/CooperativeEndAccess/refs/heads/main/.github/pull_request_template.md).
 
 By submitting a contribution to this repository, you agree that your contribution is licensed under the same license as this repository, as published in the [`LICENSE`](https://raw.githubusercontent.com/ganyuke/CooperativeEndAccess/refs/heads/main/LICENSE) file.
 
