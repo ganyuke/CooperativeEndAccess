@@ -42,7 +42,7 @@ If you:
 
 ### How do I use this plugin?
 
-1. Download the `.jar` for this plugin from either [GitHub](https://github.com/ganyuke/CooperativeEndAccess/releases) or [Modrinth](https://modrinth.com/plugin/cooperative-end-access/versions).
+1. Download the `.jar` for this plugin from either [GitHub](https://github.com/ganyuke/CooperativeEndAccess/releases), [Modrinth](https://modrinth.com/plugin/cooperative-end-access/versions), or [Spigot](https://www.spigotmc.org/resources/cooperative-end-access.134366/).
 2. Place it in your server's `plugins/` directory.
 3. Run the server.
 
