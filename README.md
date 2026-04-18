@@ -1,8 +1,12 @@
 # CooperativeEndAccess
 
-A very, very opinionated plugin for people who don't trust their friends to not beat the Ender Dragon all on their own and instead forces them to all be present to open the End Portal.
+Guarantee that the Ender Dragon fight is always be a group activity by making it impossible to open the End Portal solo!
 
-Targets Paper servers on Minecraft 1.21 to 1.21.11. Expected to be used for small (4 to 20), friend-group survival multiplayer (SMP) servers.
+With CooperativeEndAccess, all of your friends must now (1) contribute an Eye of Ender and (2) to be present at the End Portal before it can open!
+
+Targets Paper servers on Minecraft 1.21 to 26.1.2. Expected to be used for small (4 to 20), friend-group survival multiplayer (SMP) servers.
+
+Tested to work on all Minecraft 1.21.X versions and Paper's 26.1.2-7 alpha release.
 
 ## Features
 
@@ -23,8 +27,6 @@ Thanks to this plugin, your SMP experience can be improved by facilitating the f
 - Allow you to naturally open access to the End without the embarrassing moment where you have to communicate to them that you noticed that the SMP was dying and decided to finally open the End to get one last hurrah out of everyone.
 
 ## Questions
-
-These aren't frequent because I just recently made this plugin and no one has asked me any questions, but here's some pre-emptive answers, written like this because people receive information asked from an "I" perspective better.
 
 ### Who is plugin for?
 
