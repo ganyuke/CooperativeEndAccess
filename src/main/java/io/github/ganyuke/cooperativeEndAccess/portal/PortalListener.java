@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import io.github.ganyuke.cooperativeEndAccess.config.Config.MessageKey;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -106,7 +107,15 @@ public class PortalListener implements Listener {
         if (state.removeEye(frameLoc)) {
             frame.setEye(false);
             block.setBlockData(frame);
-            player.getInventory().addItem(new ItemStack(Material.ENDER_EYE));
+            // don't give eye back in Creative mode
+            if (player.getGameMode() != GameMode.CREATIVE) {
+                HashMap<Integer, ItemStack> leftover = player.getInventory().addItem(new ItemStack(Material.ENDER_EYE));
+
+                // if the player inventory is full, this hashmap will be non-empty, so we will just drop it on the ground
+                for (ItemStack item : leftover.values()) {
+                    player.getWorld().dropItemNaturally(player.getLocation(), item);
+                }
+            }
             player.sendMessage(config.getMessage(MessageKey.RESCIND_WARNING));
             persist.saveData(state);
             portalManager.updateTrackedPortals();
