@@ -46,15 +46,14 @@ public class State {
         return committedNames;
     }
 
-    public boolean removeEye(BlockKey frameLoc) {
+    public boolean removeEyeOwner(BlockKey frameLoc) {
+        boolean removed = eyeOwners.remove(frameLoc) != null;
+
         BlockKey center = PortalUtils.findPortalCenter(frameLoc);
-        if (center == null) return false;
-        int eyeCount = PortalUtils.countEndFrameEyes(center);
-        if (eyeCount - 1 == 0) {
-            // gc centers with no more owners as well
+        if (center != null && PortalUtils.countEndFrameEyes(center) == 0) {
             portalCenters.remove(center);
         }
-        return eyeOwners.remove(frameLoc) != null;
+        return removed;
     }
 
     public int countFramesOwnedBy(BlockKey center, UUID id) {

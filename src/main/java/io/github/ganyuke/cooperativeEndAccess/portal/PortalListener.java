@@ -8,10 +8,12 @@ import io.github.ganyuke.cooperativeEndAccess.data.Persist;
 import io.github.ganyuke.cooperativeEndAccess.data.State;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -43,6 +45,11 @@ public class PortalListener implements Listener {
         var event = ctx.event();
         var frame = ctx.frame();
         var block = ctx.block();
+
+        // if they ARE looking at an end frame, but it isn't a real portal,
+        // I personally don't want to handle that
+        // it's OK for removal though
+        if (ctx.center() == null) return;
 
         // PLACING AN EYE
         if (state.countFramesOwnedBy(center, uuid) >= config.getMaxEyesPerPlayer()) {
@@ -104,7 +111,7 @@ public class PortalListener implements Listener {
         // in theory, removeEye() method shouldn't return false at this point,
         // but I have it return a boolean so we'll just not run alter the world
         // if the player did not remove the eye successfully
-        if (state.removeEye(frameLoc)) {
+        if (state.removeEyeOwner(frameLoc)) {
             frame.setEye(false);
             block.setBlockData(frame);
             // don't give eye back in Creative mode
@@ -162,6 +169,30 @@ public class PortalListener implements Listener {
             // handle placement from the off-hand
             this.handleEyePlacement(ctx);
         }
+    }
+
+    // want to handle when admin in creative breaks the End Portal frame
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (state.getDragonDefeatStatus()) return;
+
+        Block block = event.getBlock();
+        if (block.getType() != Material.END_PORTAL_FRAME) return;
+
+        BlockKey frameLoc = BlockKey.from(block.getLocation());
+        BlockKey center = PortalUtils.findPortalCenter(frameLoc);
+
+        // need to clear the player's eye at the place
+        boolean success = state.removeEyeOwner(frameLoc);
+        if (!success) return; // probably a bad portal
+
+        if (center != null) {
+            // collapse open portal, remove action bar, remove tracking center
+            portalManager.forgetPortal(center);
+            portalManager.updateTrackedPortals();
+        }
+
+        persist.saveData(state);
     }
 
     @EventHandler

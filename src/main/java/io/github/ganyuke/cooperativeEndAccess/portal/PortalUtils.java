@@ -80,6 +80,17 @@ public final class PortalUtils {
             {-1, -2}, {0, -2}, {1, -2}  // North side
     };
 
+    private static BlockFace expectedFacing(BlockKey frameLoc, BlockKey center) {
+        int dx = frameLoc.x() - center.x();
+        int dz = frameLoc.z() - center.z();
+
+        if (Math.abs(dx) > Math.abs(dz)) {
+            return dx > 0 ? BlockFace.WEST : BlockFace.EAST;
+        }
+
+        return dz > 0 ? BlockFace.NORTH : BlockFace.SOUTH;
+    }
+
     @FunctionalInterface
     public interface FrameProcessor<T> {
         boolean process(BlockKey frameLoc, T accumulator);
@@ -121,6 +132,10 @@ public final class PortalUtils {
 
             if (shouldBeFilled) {
                 EndPortalFrame frame = (EndPortalFrame) block.getBlockData();
+                if (frame.getFacing() != expectedFacing(frameLoc, center)) {
+                    acc.set(false);
+                    return false;
+                }
                 if (!frame.hasEye()) {
                     acc.set(false);
                     return false;

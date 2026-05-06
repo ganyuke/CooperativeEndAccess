@@ -45,6 +45,12 @@ public class PortalManager {
         }
     }
 
+    public void forgetPortal(BlockKey center) {
+        portalFeedback.removeAudience(center);
+        portalWorldTechnician.updatePhysicalPortal(center, false);
+        state.getPortalCenters().remove(center);
+    }
+
     public void updateTrackedPortals() {
         if (state.getDragonDefeatStatus()) return;
 
