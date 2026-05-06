@@ -171,6 +171,9 @@ public class PortalListener implements Listener {
         // this plugin have had it installed since the start of the server
         if (event.getEntityType() != EntityType.ENDER_DRAGON || state.getDragonDefeatStatus()) return;
 
+        // need to open all portals that were collapsed by the plugin before shutdown
+        portalManager.openAllTrackedPortals();
+
         state.setDragonDefeatedStatus(true);
         persist.saveData(state);
         Bukkit.broadcast(config.getMessage(MessageKey.DRAGON_DEFEAT_NOTICE));
