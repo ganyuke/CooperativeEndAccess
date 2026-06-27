@@ -1,0 +1,7 @@
+name: CooperativeEndAccess
+version: ${version}
+main: io.github.ganyuke.cea.CooperativeEndAccess
+api-version: ${paper_version}
+authors: [ ganyuke ]
+description: ${description}
+website: https://github.com/ganyuke/CooperativeEndAccess

@@ -1,1 +1,27 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+
+        // get around gradle warning about maven under forRepository
+        def fabricRepo = maven {
+            name = 'Fabric'
+            url = uri('https://maven.fabricmc.net')
+        }
+
+        exclusiveContent {
+            forRepository { fabricRepo }
+            filter {
+                includeGroupAndSubgroups('net.fabricmc')
+            }
+        }
+    }
+}
+
 rootProject.name = 'CooperativeEndAccess'
+includeBuild('build-logic')
+include('core')
+include('common')
+include('paper')
+include('fabric')
+include('neoforge')

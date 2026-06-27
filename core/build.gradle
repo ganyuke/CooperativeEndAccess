@@ -1,0 +1,29 @@
+plugins {
+    id 'multiloader-common'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+}
+
+dependencies {
+    compileOnly 'org.yaml:snakeyaml:2.6'
+    compileOnly 'org.slf4j:slf4j-api:2.0.18'
+    compileOnly 'org.jetbrains:annotations:26.0.1'
+}
+
+configurations {
+    coreJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    coreResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    coreJava sourceSets.main.java.sourceDirectories.singleFile
+    coreResources sourceSets.main.resources.sourceDirectories.singleFile
+}

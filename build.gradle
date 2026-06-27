@@ -1,56 +1,6 @@
 plugins {
-    id 'java'
-    id("xyz.jpenilla.run-paper") version "3.0.2"
-}
-
-def mcVersion = (project.findProperty("mc_version") ?: "1.21.11").toString()
-def paperVersion = (project.findProperty("paper_version") ?: mcVersion).toString()
-
-repositories {
-    mavenCentral()
-    maven {
-        name = "papermc-repo"
-        url = "https://repo.papermc.io/repository/maven-public/"
-    }
-}
-
-dependencies {
-    compileOnly("io.papermc.paper:paper-api:${paperVersion}-R0.1-SNAPSHOT")
-}
-
-tasks {
-    runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion(mcVersion)
-        runDirectory.set(file("runs/${mcVersion}"))
-    }
-}
-
-def targetJavaVersion = 21
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release.set(targetJavaVersion)
-    }
-}
-
-processResources {
-    def props = [version: version, paper_version: paperVersion]
-    inputs.properties props
-    filteringCharset = 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand props
-    }
+    // see https://maven.fabricmc.net/fabric-loom/fabric-loom.gradle.plugin/maven-metadata.xml for new versions
+    id 'net.fabricmc.fabric-loom' version '1.16.3' apply false
+    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
+    id 'net.neoforged.moddev' version '2.0.141' apply false
 }

@@ -4,9 +4,13 @@ Guarantee that the Ender Dragon fight is always be a group activity by making it
 
 With CooperativeEndAccess, all of your friends must now (1) contribute an Eye of Ender and (2) to be present at the End Portal before it can open!
 
-Targets Paper servers on Minecraft 1.21 to 26.1.2. Expected to be used for small (4 to 20), friend-group survival multiplayer (SMP) servers.
+Targets Paper servers on **Minecraft 1.21 to 26.2**. Expected to be used for small (4 to 20), friend-group survival multiplayer (SMP) servers.
 
-Tested to work on all Minecraft 1.21.X versions and Paper's 26.1.2-7 alpha release.
+Tested to work on all Minecraft 1.21.X versions and Paper's 26.2-37 alpha release.
+
+Fabric and NeoForge versions support only **Minecraft 26.2** and require the respective platform's [adventure-platform-mod](https://modrinth.com/mod/adventure-platform-mod) (version **7.0.0**) to be installed alongside this mod.
+
+The Fabric version also requires [Fabric API](https://modrinth.com/mod/fabric-api) for Minecraft 26.2 installed alonside this mod.
 
 ## Features
 
@@ -30,7 +34,7 @@ Thanks to this plugin, your SMP experience can be improved by facilitating the f
 
 ### Who is plugin for?
 
-Server administrators running a small, Paper-based Minecraft 1.21 to 1.21.11 survival multiplayer server (SMP) who are shy / lack enough social currency to convince / do not trust their friends not to beat the dragon solo.
+Server administrators running a small Minecraft survival multiplayer server (SMP) for their friends and who are shy / lack enough social currency to convince / do not trust their friends not to beat the dragon solo.
 
 If you:
 
@@ -43,7 +47,7 @@ If you:
 ### How do I use this plugin?
 
 1. Download the `.jar` for this plugin from either [GitHub](https://github.com/ganyuke/CooperativeEndAccess/releases), [Modrinth](https://modrinth.com/plugin/cooperative-end-access/versions), or [Spigot](https://www.spigotmc.org/resources/cooperative-end-access.134366/).
-2. Place it in your server's `plugins/` directory.
+2. Place it in your server's `plugins/` directory (or `mods/` on Fabric/NeoForge).
 3. Run the server.
 
 If you have already started your server, **this plugin will not handle existing End Portals or filled frames**. You will need to handle these yourself.
@@ -74,15 +78,20 @@ If the dragon is defeated, all End Portals become stabilized and vanilla End Por
 - This plugin does not handle existing Eyes of Ender placed in the frames (player-placed before the plugin was added or naturally-spawned ones). If you want to handle naturally-spawned Eyes of Ender, mess with your world configuration.
 - This plugin does not handle existing, open End Portals. Break them yourself.
 - This plugin does not handle having killed the dragon before adding the plugin.
-  - If you would like to replicate the functionality of this plugin after killing the dragon, I recommend using this handy little command:
-    `find ./plugins -maxdepth 1 -type f -name 'CooperativeEndAccess-*.jar' -delete`
+    - If you would like to replicate the functionality of this plugin after killing the dragon, I recommend using this handy little command:
+      `find ./plugins -maxdepth 1 -type f -name 'CooperativeEndAccess-*.jar' -delete`
 - This plugin does not guarantee that your SMPs will survive more than one week.
 - This plugin does not guarantee that your friends won't be upset if you suddenly spring this plugin on them without telling them.
 - This plugin does not guarantee that opening the End cooperatively will actually be any fun.
 
-### Help! I deleted my `config.yml`!
+### How do I configure this plugin?
 
-That's not a question, but here is the default:
+You can configure this plugin by running the plugin on your server once so it generates its configuration files. Then, you can find the plugin's configuration files at (relative to your server root directory):
+
+- `plugins/CooperativeEndAccess/` (Paper)
+- `config/cooperativeendaccess/` (Fabric and NeoForge)
+
+The default file can be found below:
 
 ```yaml
 # Maximum eyes one player can contribute to a single portal structure
@@ -153,7 +162,7 @@ messages:
   waiting_action_bar: "<gold>Waiting for: <white><names>"
 ```
 
-You can also find this file in [`./src/main/resources/config.yml`](https://raw.githubusercontent.com/ganyuke/CooperativeEndAccess/refs/heads/main/src/main/resources/config.yml).
+You can also find this file in [`./core/src/main/resources/config.yml`](https://raw.githubusercontent.com/ganyuke/CooperativeEndAccess/refs/heads/main/src/main/resources/config.yml).
 
 ### How do I tell you that your plugin is broken?
 
@@ -161,10 +170,25 @@ Report issues with my spaghetti code through the [issue tracker](https://github.
 
 ### How do I build this plugin myself?
 
+You will need a JDK 25 to build all branches of this plugin. You can download JDK 25 from [Adoptium](https://adoptium.net/temurin/releases/?version=25&os=any&arch=any). Point `gradlew` to your unzipped JDK directory by appending the `./gradlew` commands below with `JAVA_HOME=<path_to_your_jdk_directory>`.
+
+#### On Paper
+
 1. Clone this repository: `git clone https://github.com/ganyuke/CooperativeEndAccess.git`
 2. Change directory: `cd CooperativeEndAccess`
-3. Build the `.jar`: `./gradlew build`
-4. Find the built `.jar` in `build/libs/`
+3. Build the `.jar`: `./gradlew :paper:build`
+4. Find the built `.jar` in `./paper/build/libs/`
+
+The Paper branch will automatically compile down to Java 21 bytecode so it can run on Paper-based Minecraft 1.21 servers, which require Java 21 to run.
+
+#### On Fabric/NeoForge
+
+1. Clone this repository: `git clone https://github.com/ganyuke/CooperativeEndAccess.git`
+2. Change directory: `cd CooperativeEndAccess`
+3. Build the `.jar`: `./gradlew :fabric:build` (for Fabric) or `./gradlew :neoforge:build` (for NeoForge)
+4. Find the built `.jar` in `./fabric/build/libs/` (for Fabric) or `./neoforge/build/libs/` (for NeoForge)
+
+You will want the `.jar` with the Minecraft version after a `+` sign (no `javadoc` or `sources` in the filename).
 
 ### How do I submit features for this plugin?
 
@@ -193,3 +217,7 @@ TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
 0. You just DO WHAT THE FUCK YOU WANT TO.
 ```
+
+## Attribution
+
+This project's multiloader setup is forked from the 26.2 branch of [MultiLoder-Template](https://github.com/jaredlll08/MultiLoader-Template/tree/178d1abb85e7d4ef7903bdd8fe9f4f9e0748c80c) by [jaredlll08](https://github.com/jaredlll08).

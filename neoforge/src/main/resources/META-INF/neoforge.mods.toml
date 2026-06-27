@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "${neoforge_loader_version_range}"
+license = "${license}"
+[[mods]]
+modId = "${mod_id}"
+version = "${version}"
+displayName = "${mod_name}"
+credits = "${credits}"
+authors = "${mod_author}"
+description = '''${description}'''
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neoforge_version},)"
+ordering = "NONE"
+side = "SERVER"
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "SERVER"
+[[dependencies.${mod_id}]]
+modId="adventure_platform_neoforge" # The ModID for Kyori's official NeoForge distribution
+type = "required"
+versionRange = "[7.0.0,)"
+ordering = "NONE"
+side = "SERVER"

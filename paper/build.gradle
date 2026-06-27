@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id("xyz.jpenilla.run-paper") version "3.0.2"
+}
+
+def mcVersion = (project.findProperty("mc_version") ?: "1.21.11").toString()
+def paperVersion = (project.findProperty("paper_version") ?: "1.21").toString()
+
+repositories {
+    mavenCentral()
+    maven { name = "papermc-repo"; url = "https://repo.papermc.io/repository/maven-public/" }
+}
+
+dependencies {
+    // Paper should already have SnakeYAML and Kyori Adventure bundled with the server
+    // runtime, so we don't need to include it in the plugin artifact.
+    compileOnly("io.papermc.paper:paper-api:${paperVersion}-R0.1-SNAPSHOT")
+    implementation(project(':core'))
+}
+
+tasks {
+    runServer {
+        minecraftVersion(mcVersion)
+        runDirectory = file("runs/${mcVersion}")
+    }
+}
+
+def targetJavaVersion = 21
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release.set(targetJavaVersion)
+}
+
+processResources {
+    from(project(':core').sourceSets.main.resources)
+    def props = [version: version, paper_version: paperVersion, description: project.description]
+    inputs.properties props
+    filteringCharset = 'UTF-8'
+    filesMatching('plugin.yml') { expand props }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named('jar', Jar) {
+    def cleanModName = project.findProperty("mod_name")?.toString()?.replace(" ", "")
+    archiveBaseName = cleanModName ?: "CooperativeEndAccess"
+    
+    from(project(':core').sourceSets.main.output)
+    dependsOn(project(':core').tasks.named('classes'))
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

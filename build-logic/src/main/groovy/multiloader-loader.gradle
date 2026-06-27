@@ -1,0 +1,49 @@
+plugins {
+    id 'multiloader-common'
+}
+
+configurations {
+    coreJava { canBeResolved = true }
+    coreResources { canBeResolved = true }
+    commonJava { canBeResolved = true }
+    commonResources { canBeResolved = true }
+}
+
+dependencies {
+    compileOnly(project(':core'))
+    compileOnly(project(':common')) {
+        def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+        attributes { attribute(loaderAttribute, 'common') }
+    }
+    coreJava(project(path: ':core', configuration: 'coreJava'))
+    coreResources(project(path: ':core', configuration: 'coreResources'))
+    commonJava(project(path: ':common', configuration: 'commonJava'))
+    commonResources(project(path: ':common', configuration: 'commonResources'))
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn(configurations.coreJava, configurations.commonJava)
+    source(configurations.coreJava)
+    source(configurations.commonJava)
+}
+
+processResources {
+    dependsOn(configurations.coreResources, configurations.commonResources)
+    from(configurations.coreResources)
+    from(configurations.commonResources)
+}
+
+tasks.named('javadoc', Javadoc).configure {
+    dependsOn(configurations.coreJava, configurations.commonJava)
+    source(configurations.coreJava)
+    source(configurations.commonJava)
+}
+
+tasks.named('sourcesJar', Jar) {
+    dependsOn(configurations.coreJava, configurations.commonJava)
+    from(configurations.coreJava)
+    from(configurations.commonJava)
+    dependsOn(configurations.coreResources, configurations.commonResources)
+    from(configurations.coreResources)
+    from(configurations.commonResources)
+}
