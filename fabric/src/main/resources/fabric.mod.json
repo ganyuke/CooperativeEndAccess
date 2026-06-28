@@ -17,6 +17,7 @@
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
         "minecraft": "~${minecraft_version}",
-        "java": ">=${java_version}"
+        "java": ">=${java_version}",
+        "adventure-platform-fabric": ">=7.0.0"
     }
 }
