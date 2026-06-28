@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Build JARs
+        run: ./gradlew :paper:jar :fabric:build :neoforge:build --no-daemon
+
+      - name: Collect release JARs
+        run: |
+          mkdir -p artifacts
+
+          find paper/build/libs -maxdepth 1 -name 'CooperativeEndAccess-*.jar' \
+            ! -name '*-sources.jar' \
+            ! -name '*-javadoc.jar' \
+            -exec cp -t artifacts/ {} +
+
+          find fabric/build/libs neoforge/build/libs -maxdepth 1 -name '*+*.*' \
+            ! -name '*-sources.jar' \
+            ! -name '*-javadoc.jar' \
+            ! -name '*-dev.jar' \
+            -exec cp -t artifacts/ {} +
+
+          echo "Release artifacts:"
+          ls -lh artifacts/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-jars
+          path: artifacts/*.jar
+          if-no-files-found: error
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: artifacts/*.jar
