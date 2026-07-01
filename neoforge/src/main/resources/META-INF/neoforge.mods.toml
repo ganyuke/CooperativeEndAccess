@@ -17,12 +17,12 @@ side = "SERVER"
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 type = "required"
-versionRange = "${minecraft_version_range}"
+versionRange = "${neoforge_minecraft_version_range}"
 ordering = "NONE"
 side = "SERVER"
 [[dependencies.${mod_id}]]
 modId="adventure_platform_neoforge" # The ModID for Kyori's official NeoForge distribution
 type = "required"
-versionRange = "[7.0.0,)"
+versionRange = "[${adventure_version},)"
 ordering = "NONE"
 side = "SERVER"

@@ -60,7 +60,7 @@ sourceSets.configureEach {
     }
 }
 dependencies {
-    implementation("net.kyori:adventure-platform-neoforge:7.0.0")
+    implementation("net.kyori:adventure-platform-neoforge:${adventure_version}")
     jarJar(implementation("org.yaml:snakeyaml:2.6"))
 }
 

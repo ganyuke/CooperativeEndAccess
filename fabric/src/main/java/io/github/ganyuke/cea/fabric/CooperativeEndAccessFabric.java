@@ -19,7 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
@@ -84,7 +84,7 @@ public final class CooperativeEndAccessFabric implements ModInitializer {
          * doesn't fire if you use `/kill @e[type=minecraft:ender_dragon]`. So I guess don't do that.
          */
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
-            if (entity.getType() != EntityTypes.ENDER_DRAGON) return;
+            if (entity.getType() != EntityType.ENDER_DRAGON) return;
             PortalController controller = bootstrap.controller();
             if (controller != null) controller.dragonDeath();
         });

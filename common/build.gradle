@@ -11,8 +11,7 @@ neoForge {
 
 dependencies {
     api(project(':core'))
-    compileOnly('net.kyori:adventure-platform-mod-shared:7.0.0')
-    compileOnly('net.kyori:adventure-text-minimessage:5.1.1')
+    compileOnly("net.kyori:adventure-platform-mod-shared:${adventure_version}")
     compileOnly('net.fabricmc:sponge-mixin:0.17.3+mixin.0.8.7')
     compileOnly(annotationProcessor('io.github.llamalad7:mixinextras-common:0.5.3'))
 }

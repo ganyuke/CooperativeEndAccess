@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
@@ -47,9 +47,7 @@ public final class CooperativeEndAccessNeoForge {
     }
 
     private void onServerStarted(ServerStartedEvent event) {
-//        LOGGER.info("Enabling mod Cooperative End Access NeoForge!");
         bootstrap.start(event.getServer());
-//        LOGGER.info("Cooperative End Access enabled!");
     }
 
     private void onServerStopping(ServerStoppingEvent event) {
@@ -95,7 +93,7 @@ public final class CooperativeEndAccessNeoForge {
     }
 
     private void onLivingDeath(LivingDeathEvent event) {
-        if (event.getEntity().getType() != EntityTypes.ENDER_DRAGON) return;
+        if (event.getEntity().getType() != EntityType.ENDER_DRAGON) return;
         PortalController controller = bootstrap.controller();
         if (controller != null) controller.dragonDeath();
     }
